@@ -10,45 +10,43 @@ import java.util.Scanner;
 
 public class ConnectFour
 {
-	public static Scanner input = new Scanner(System.in); // need a scanner
+	public static Scanner input = new Scanner(System.in); 
 	static final int ROWS = 6, COLS = 7; // rows and columns of array
 	static char[][] board = new char[ROWS][COLS]; // 6-x-7 array to simulate the board
 
 	public static void main(String[] args)
 	{
 
-		int playagain = 0; // declaring play again to be used for loop
+		System.out.println("Enter column value to play (0-6):");
+		
+		boolean playAgain = false; 
 
-		do  //need a loop, using a do while
+		do
 		{
 			boolean over = false; // over used for ending loop, is determined by isWinner method
 			int count = 0; // count is also used for ending loop counts how many turns
 
 			displayBoard(board); // displays board
 
-			int i = 1;
-			switch (i)
+			
+			while (over != true || count == 42)
 			{
-			case 1:
-				while (over != true || count == 42)
-				{
 
-					dropDisk('Y', board); // drops yellow disk
-					count++;
-					displayBoard(board); // displays board
-					over = isWinner(board);
-					if (over == true || count == 42)
-						break; // checks winner
+				dropDisk('Y', board); // drops yellow disk
+				count++;
+				displayBoard(board); // displays board
+				over = isWinner(board);
+				if (over == true || count == 42)
+					break; // checks winner
 
-					dropDisk('R', board); // drops red disk
-					count++;
-					displayBoard(board); // displays board
-					over = isWinner(board);
-					if (over == true || count == 42)
-						break; // checks winner
-
-				}
+				dropDisk('R', board); // drops red disk
+				count++;
+				displayBoard(board); // displays board
+				over = isWinner(board);
+				if (over == true || count == 42)
+					break; // checks winner
 			}
+			
 			//need to check who won
 			if (over == true && isOddEven(count) == 1)
 				System.out.println("Y has WON the game!"); //if count is odd, Y wins
@@ -56,14 +54,28 @@ public class ConnectFour
 				System.out.println("R has WON the game!"); //if count is even, R wins
 			else if (count == 42)
 				System.out.println("I declare a draw"); //if count is 42, draw
-
+			
+			String response="";
+			while(!response.equals("yes") || !response.equals("no"))
+			{
 			//Prompting to play again 
-			System.out.println("DO YOU WANT TO PLAY A NEW GAME? (type 1 for yes)");
-			playagain = input.nextInt();
-			//reset board if user decides to play again
-			if (playagain == 1)
-				board = new char[6][7];
-		} while (playagain == 1); //continues to loop as long as playagain is 1
+			System.out.println("DO YOU WANT TO PLAY A NEW GAME? (yes or no)");
+			response = input.next();
+			if(response.equals("yes")) {
+				playAgain=true;
+				board = new char[6][7]; //reset board if user decides to play again
+				break;
+			}
+			else if(response.equals("no")) {
+				playAgain=false;
+				break;
+			}
+			else
+				System.out.println("Invalid response try again");
+			}
+			
+				
+		} while (playAgain == true); //continues to loop as long as playagain is true
 
 	}
 
@@ -90,14 +102,17 @@ public class ConnectFour
 		 * It uses static variable board, and checks the values of the array.
 		 * It does this via many different logic checks.
 		 */
+		
+		//checks horizontally row by row
 		for (int r = 0; r < ROWS; r++) // for EVERY row
 			for (int c = 0; c <= 3; c++) // for columns 0-3
 				if (board[r][c] != '\u0000' && // if it's not empty, AND
 						board[r][c] == board[r][c + 1] && // it matches neighbor 1 AND
 						board[r][c] == board[r][c + 2] && // it matches TWO over AND
-						board[r][c] == board[r][c + 3])
-					return true; // THREE over, then it's a WINNER!
-
+						board[r][c] == board[r][c + 3])	  // THREE over, then it's a WINNER!
+					return true;
+		
+		//checks vertically column by column
 		for (int r = 0; r <= 2; r++) // for rows less than or equal to 2
 			for (int c = 0; c < COLS; c++) // for all columns
 				if (board[r][c] != '\u0000' && // if it's not empty, AND
@@ -106,6 +121,7 @@ public class ConnectFour
 						board[r][c] == board[r + 3][c])
 					return true; // it match above 3, then it's a WINNER!
 
+		//checks diagonally from the bottom left to top right
 		for (int r = 0; r < 3; r++) // for rows less than 3
 			for (int c = 0; c < 4; c++) // for columns less than 4
 				if (board[r][c] != '\u0000' && // if it's not empty, AND
@@ -114,6 +130,7 @@ public class ConnectFour
 						board[r][c] == board[r + 3][c + 3]) // it matches above and over 3
 					return true; // then it's a WINNER!
 
+		//checks diagonally from the bottom right to top left
 		for (int r = 3; r < ROWS; r++) // for EVERY row
 			for (int c = 0; c < 4; c++) // for columns less than 4
 				if (board[r][c] != '\u0000' && // if it's not empty, AND
@@ -122,6 +139,7 @@ public class ConnectFour
 						board[r][c] == board[r - 3][c + 3]) // it match down and over 3
 					return true; // then it's a WINNER!
 
+		
 		for (int r = 3; r < 5; r++) // for rows than 5
 			for (int c = 3; c < 6; c++) // for columns less than 6
 				if (board[r][c] != '\u0000' && // if it's not empty, AND
@@ -131,7 +149,6 @@ public class ConnectFour
 					return true; // then it's a WINNER!
 
 		return false; //otherwise return false, there is no winner
-
 	}
 
 	public static void dropDisk(char player, char[][] board)
